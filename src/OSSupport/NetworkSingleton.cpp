@@ -166,6 +166,7 @@ void cNetworkSingleton::RunEventLoop(cNetworkSingleton * a_Self)
 	auto timer = evtimer_new(a_Self->m_EventBase, SignalizeStartup, a_Self);
 	timeval timeout{};  // Zero timeout - execute immediately
 	evtimer_add(timer, &timeout);
+	pthread_setname_np(pthread_self(), "LibEvent Poll");
 	event_base_loop(a_Self->m_EventBase, EVLOOP_NO_EXIT_ON_EMPTY);
 	event_free(timer);
 }

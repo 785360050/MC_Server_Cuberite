@@ -177,9 +177,7 @@ static int UniversalMain(int argc, char * argv[], const bool a_RunningAsService)
 
 			cRoot Root;
 			if (!Root.Run(Settings))
-			{
 				break;
-			}
 		}
 
 		return EXIT_SUCCESS;

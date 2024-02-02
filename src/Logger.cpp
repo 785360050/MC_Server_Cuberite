@@ -23,10 +23,12 @@ static void WriteLogOpener(fmt::memory_buffer & Buffer)
 #endif
 
 #ifndef NDEBUG
-	const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
-	fmt::format_to(
-		Buffer, "[{0:04x}|{1:02d}:{2:02d}:{3:02d}] ",
-		ThreadID, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
+	// const auto ThreadID = std::hash<std::thread::id>()(std::this_thread::get_id());
+	char threadName[16];
+	pthread_getname_np(pthread_self(), threadName, sizeof(threadName));
+	fmt::format_to(//直接显示线程名
+		Buffer, "[{0:16s}|{1:02d}:{2:02d}:{3:02d}] ",
+		threadName, timeinfo.tm_hour, timeinfo.tm_min, timeinfo.tm_sec
 	);
 #else
 	fmt::format_to(

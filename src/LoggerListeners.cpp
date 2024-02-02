@@ -118,7 +118,8 @@
 				case eLogLevel::Regular:
 				{
 					// Whatever the console default is
-					printf("\x1b[0m");
+					// printf("\x1b[0m");
+					printf("\x1b[36m");	 // Cyan 深蓝
 					break;
 				}
 				case eLogLevel::Info:

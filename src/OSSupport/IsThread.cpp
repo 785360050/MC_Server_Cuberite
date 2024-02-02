@@ -5,14 +5,14 @@
 
 #include "Globals.h"
 #include "IsThread.h"
-
+#include <sys/prctl.h>
 
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // cIsThread:
-
+// #include <string>
 cIsThread::cIsThread(AString && a_ThreadName) :
 	m_ShouldTerminate(false),
 	m_ThreadName(std::move(a_ThreadName))
@@ -90,7 +90,7 @@ void cIsThread::Entrypoint(void)
 
 
 
-
+#include <string>
 void cIsThread::SetThreadName() const
 {
 #if defined(_MSC_VER) && !defined(NDEBUG)
@@ -122,6 +122,20 @@ void cIsThread::SetThreadName() const
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
+	}
+#elif defined(__linux__)
+	// std::this_thread::get_id();
+	// if(!m_ThreadName.empty() and m_ThreadName.size() < 16)
+	if(!m_ThreadName.empty())
+	{
+		if (pthread_setname_np(pthread_self(), m_ThreadName.c_str()))
+		{
+			std::string thread_name =
+				std::string(m_ThreadName.begin(), m_ThreadName.begin() + 15);
+			LOGD("Thread name too long, truncating to: %s", m_ThreadName.c_str());
+			pthread_setname_np(pthread_self(), thread_name.c_str());
+		}
+		LOGD("Thread %s named", m_ThreadName.c_str());
 	}
 #endif
 }

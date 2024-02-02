@@ -110,9 +110,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	{
 		auto fileLogListenerRet = MakeFileListener();
 		if (!fileLogListenerRet.first)
-		{
 			throw std::runtime_error("failed to open log file");
-		}
 		fileAttachment = cLogger::GetInstance().AttachListener(std::move(fileLogListenerRet.second));
 	}
 
@@ -129,15 +127,13 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	LoadGlobalSettings();
 
 	LOG("Creating new server instance...");
-	m_Server = new cServer();
+	m_Server = new cServer();  // 包含m_TickThread，该线程负责update时间并控制生物生成和死亡
 
 	LOG("Reading server config...");
 
 	m_SettingsFilename = "settings.ini";
 	if (a_OverridesRepo.HasValue("Server","ConfigFile"))
-	{
 		m_SettingsFilename = a_OverridesRepo.GetValue("Server","ConfigFile");
-	}
 
 	auto IniFile = std::make_unique<cIniFile>();
 	bool IsNewIniFile = !IniFile->ReadFile(m_SettingsFilename);
@@ -191,7 +187,7 @@ bool cRoot::Run(cSettingsRepositoryInterface & a_OverridesRepo)
 	m_Authenticator.Start(*settingsRepo);
 
 	LOGD("Starting worlds...");
-	StartWorlds(dd);
+	StartWorlds(dd);//开启update世界并控制生物刷新
 
 	if (settingsRepo->GetValueSetB("DeadlockDetect", "Enabled", true))
 	{
@@ -1006,6 +1002,7 @@ void cRoot::HandleInput()
 
 	cLogCommandOutputCallback Output;
 	AString Command;
+	pthread_setname_np(pthread_self(), "Input Handle");
 
 	while (s_NextState == NextState::Run)
 	{
