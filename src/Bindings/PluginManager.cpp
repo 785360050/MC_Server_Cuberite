@@ -114,7 +114,7 @@ void cPluginManager::ReloadPluginsNow(void)
 
 void cPluginManager::ReloadPluginsNow(cSettingsRepositoryInterface & a_Settings)
 {
-	LOG("-- Loading Plugins --");
+	LOGINFO("-- Loading Plugins --");
 
 	// Unload any existing plugins:
 	m_bReloadPlugins = false;
